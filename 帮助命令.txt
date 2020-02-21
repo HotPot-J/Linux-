@@ -1,0 +1,19 @@
+1.帮助命令： man 
+命令英文原意：manual（说明书 手册）
+执行权限：所有用户
+语法： man[命令或配置文件]
+功能描述： 获得帮助信息
+范例：man ls 查看ls命令的帮助信息
+      man services 查看配置文件services的帮助信息
+	  
+2.简短的查看一个命令信息： whatis
+例：whatis ls   查看ls命令的帮助信息 比man要简短一点
+
+3.查看一个命令的选项：--help
+例：touch --help  查看touch命令有哪些选项 分别是什么作用
+
+4.help
+命令所在路径：Shell内置命令  Shell：命令解释器 简单理解是其把命令传递给内核 内核在显示
+一个结果 再显示给用户看
+语法：help 命令
+例： help umask  查看umask命令的能帮助信息
