@@ -1,0 +1,58 @@
+1.文件搜索命令：find
+find命令所在路径：/bin/find
+执行权限：所有用户
+语法：find[搜索范围][匹配条件]
+功能描述：文件搜索 
+(1) 根据文件名查找
+例：find /etc -name init  在目录/etc中查找文件init
+    find /etc -name *init*  在目录/etc中查找文件名包含init的文件 （*为通配符）
+	find /etc -name  init？？？ 在目录/etc中查找文件名包含init的文件并且其后边为3个字符  （？匹配单个字符）
+ -name区分大小写
+ -iname区分大小写
+
+(2) 根据文件大小查找
+例：find / -size +204800  在根本目录下查找大于100MB的文件  204800指的是这么多个数据块 Linux下 1数据块 512字节 0.5k 100MB=102400kb=204800 
+ +n 大于  -n小于  n等于
+
+(3) 根据问件所有者查找
+例：find /home -user jxy  在家目录下查找所有者为jxy的文件
+   -group 根据文件所属组查找
+(4) 根据访问时间查找
+例： find /etc -cmin -5  在/etc下查找5分钟之内被修改过属性的文件和目录
+   -amin 访问时间 access
+   -cmin 文件属性 change
+   -mmin 文件内容 moddify
+   
+(5)更为复杂的连接符选项
+例： find /etc -size +163840 -a -size -204800 在/etc下查找大于80MB小于100MB的文件
+-a 两个条件同时满足
+-o 两个条件满足任意一个
+
+例： find /etc -name inittab -exec ls -l {} \;  在/etc下查找inittab文件并显示详其细信息
+ -exec或者-ok 命令{}\; 对搜索结果执行操作
+ -ok会询问你是否进行这样的操作
+ 
+ 2.其他搜索命令： locate 实质是建立了一个资料库 定期将系统中的文件收录 查找时直接去资料库查找
+  用updatedb去更新这个资料库
+ 命令所在路径： /usr/bin/locate
+ 语法： locate 文件名
+ 功能描述：在文件资料库中查找文件
+ 范例：lacate inittab
+lacate -i inittab 不区分大小写
+
+3.针对命令搜索的命令： which 
+语法：which 命令
+功能描述：搜索命令所在的目录及别名信息
+范例：which ls
+ 
+ 4.文件内容搜索命令：grep
+ 执行权限：所有用户
+ 语法：grep -iv [指定字串][文件]
+ 功能描述： 在文件中搜寻字符串匹配的行并输出
+ -i 不区分大小写
+ -v 排除指定字串
+ 例： grep mysql /root/install.log  查找/root/install.log文件中又mysql的内容
+ 
+ 
+ 
+    
