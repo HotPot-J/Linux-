@@ -1,0 +1,52 @@
+1.C语言阶段的文件操作
+ （1） FILE *fopen（const char*path,const char* mode）;
+  
+   FILE：返回值是文件流指针
+   path: 需要打开哪一个文件,可以带路径，如果不带路径，则在当前的目录下寻找。
+   mode：
+         r：以阅读方式打开，如果当前打开的文件不存在，则报错
+		 r+：以读写方式打开，如果当前文件不存在，则报错
+		 w：以写方式打开，如果文件不存在则创建。如果存在则将当前文件截断（清空，文件流指针指向开头）
+		 w+：以读写方式打开，如果文件不存在则创建。如果存在则将当前文件截断（清空，文件流指针指向开头）
+		 a：以追加方式打开，如果文件不存在则创建。
+		 a+：以追加方式打开，如果文件不存在则创建，当前的a+是支持读的
+		 
+		 
+  （2） size_t fread(void *ptr,size_t size,size_t nmemb,FILE *stream);
+          ptr: 将fread读到的内容保存到ptr里面
+		  size：块的大小
+		  nmemb：块的个数
+		     size*nmemb == 总的字节数量
+		  stream：文件流指针，从哪里读
+			 返回值：返回成功读的块的个数
+		 常用的用法：将块的大小指定为1，块的个数就是ptr的内存空间大小
+		 
+  （3） size_t fwrite(const void *ptr,size_t size,size_t nmemb,FILE *stream);
+          ptr:写入什么数据，写的数据放在ptr中
+		  size：块的大小
+		  numemb：块的个数
+		  stream：写到哪里去，文件流指针
+		  返回值：返回成功写入的块的个数
+		  常用的用法：将块的大小指定为1，块的个数就是成功写入的字节数量
+		  
+  （4） int fseek（FILE* stream，long offset，int whence）;
+          stream：文件流指针
+		  offset：偏移量，针对第三个参数whence的
+		  whence：需要将文件流指针定位到哪个位置
+		      SEEK_SET 指向文件头
+			  SEEK_END 指向文件尾
+			  SEEK_CUR 指向当前位置
+			  
+  （5） int fclose（FILE *fp）;
+           fp:文件流指针
+		   
+   ** ulimnit -a
+                  该指令结果中显示 open files: 1024 说明Linux下最多打开文件1024个
+				   
+				  但是我们的测试程序filecount.c中运行结果显示为打开了1021个
+				  原因：已经有三个文件在进程创建的时候就已经打开了分别为
+				      stdin：标准输入
+					  stdout：标准输出
+					  stderr：标准错误
+			  
+		  
