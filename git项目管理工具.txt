@@ -1,0 +1,12 @@
+git：项目管理工具
+svn：也是一个管理工具 
+
+二者区别为git：分布式版本管理 （每个人的电脑都是git版本仓库 提交给git服务器）
+          svn：集成式版本管理 （直接给svn服务器统一管理）
+		
+ git使用：
+       克隆代码到本地：git clone https://github.com/HotPot-J/Linux-.git 将建好的仓库克隆到所建文件夹下
+	   添加本地文件：  git  add makefile jxy.c 
+	   提交代码到本地仓库： git commit -m "自己的文件备注信息"
+	   提交本地代码到服务器分支 git push origin  master（分支名 目前练习阶段就只有master主分支） 
+	                        git branch命令查看分支
