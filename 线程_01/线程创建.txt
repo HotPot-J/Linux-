@@ -1,0 +1,45 @@
+#include<stdio.h>
+  2 #include<pthread.h>
+  3 #include<unistd.h>//sleep函数
+  4 #include<stdlib.h>
+  5 
+  6 //为arg定义一个自定义类型 并在堆上开辟空间 进行传值
+  7 typedef struct thread_info{
+  8      int thread_num_;
+  9      thread_info(){
+ 10      thread_num_ = -1;
+ 11      }
+ 12  }thread_info;
+ 13 void* thread_start(void* arg){
+ 14     thread_info* ti = (thread_info*)arg;
+ 15    while(1){
+ 16     printf("I am thread%d\n",ti->thread_num_);
+ 17     sleep(1);
+ 18    }
+ 19    //对于传递进来的堆上开辟的内存，可以在线程入口函数结束的时候进行释放，不会导致
+ 20    //内存泄漏的风险 
+ 21    delete ti;
+ 22    return NULL;
+ 23 }
+ 24 int main(){
+ 25 
+ 26     pthread_t tid;
+ 27     //int i = 10;//i是临时变量 传不过去的
+ 28     //int ret = pthread_create(&tid,NULL,thread_start,(int*)&i);
+ 29     for(int i = 0;i<3;i++){
+ 30     thread_info* threadinfo = (thread_info*)malloc(sizeof(thread_info));
+    threadinfo->thread_num_ = i;
+ 32     int ret = pthread_create(&tid,NULL,thread_start,(void*)threadinfo);
+ 33     if(ret!=0){
+ 34         //线程创建失败
+ 35      perror("pthread_create");
+ 36      return 0;
+ 37     }
+ 38     }
+ 39     while(1){
+ 40      printf("I am main thread\n");
+ 41      sleep(1);
+ 42     }
+ 43 return 0;
+ 44 
+ 45 }
