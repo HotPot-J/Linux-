@@ -1,0 +1,36 @@
+互斥锁的使用流程：
+  1.初始化互斥量：
+ 静态分配:pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER
+    pthread_mutex_t本身是一个结构体，PTHREAD_MUTEX_INITIALIZER宏定义是个结构体的值，使用这种初始化方式可以直接填充pthread_mutexattr_t这个结构体
+
+ 动态分配：
+  int pthread_mutex_init(pthread_mutex_t* mutex,const pthread_mutexattr_t* attr);
+      mutex:互斥锁变量，传参的时候传入互斥锁变量的地址
+	  attr：互斥锁的属性，一般情况下采用默认的属性，传值为NULL即可
+
+  2.加锁
+   (1) int pthread_mutex_lock(pthread_mutex_t* mutex); 阻塞加锁操作
+	 mutex:互斥锁变量的地址，来进行加锁操作
+如果使用该接口进行加锁操作的时候：
+   如果计数器当中的值为1，意味着可以加锁，加锁操作之后，对计数器当中的从1改变为0
+   如果计数器当中的值为0，意味着不可以加锁，该接口阻塞等待，执行流就不会往下继续执行了
+   (2)int pthread_mutex_trylock(pthread_mutex_t* mutex); 非阻塞加锁操作
+     mutex:传入互斥锁变量的地址，来进行加锁操作
+ 如果使用该接口进行加锁操作的时候：
+     如果计数器当中的值为1，意味着可以加锁，加锁操作之后，对计数器当中的1改变为0。
+	 如果计数器当中的值为0，意味着不可以加锁，该接口直接返回，并进行阻塞等待，返回为EBUSY（拿不到互斥锁）
+
+	 一般在使用trylock这样的接口进行加锁操作的时候，一般采用循环加锁的操作，防止由于拿不到锁资源而直接返回，从而可能代码当中直接访问临界资源，从而导致程序产生二义性的结果。
+    
+	(3) int pthread_mutex_timedlock(pthread_mutex_t* mutex,const struct timespec* abs_timeout);
+	   mutex:互斥锁变量
+	   abs_timeout:加锁超时间，当加锁时，超过加锁的超时时间之后，还没有获取的互斥锁，则报错返回，不再进行阻塞等待，返回ETIMEOUT
+	   struct timespce 有两个变量，一个代表秒，一个代表纳秒
+
+  3.解锁
+     int pthread_mutex_unlock(pthread_mutex_t* mutex);
+	 使用加锁的三种接口，都可以用unlock接口解锁
+
+  4.销毁互斥锁
+     int pthread_mutex_destroy(pthread_mutex_t* mutex);
+	   互斥锁销毁接口，如果使用互斥锁完成之后，不掉用销毁接口，就会造成内存泄漏。
