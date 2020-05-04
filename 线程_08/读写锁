@@ -1,0 +1,55 @@
+读写锁：
+   1.适用场景
+		少量写+大量读
+	 特点：允许不同用于读的线程，可以获取读模式下的读写锁而并行的运行（允许读的并行）
+	
+   2.读写锁的三种状态
+		读模式下的加锁状态
+		写模式下的加锁状态
+		不加锁的状态
+
+   3.加锁规则
+     3.1
+	    一次只有一个线程可以占有写模式的读写锁----不能同时写
+	    一个执行流进行写的时候，其他的执行流既不能写 也不能读
+
+	 3.2
+	    多个线程可以同时占有读模式下的读写锁，在读写锁的内部有一个引用计数
+		   引用计数：标识有多少读模式打开的读写锁
+					 每当打开一个以读模式的读写锁的时候，引用计数器进行++
+					 每当释放一个以读模式打开的读写锁的时候，引用计数--
+
+		作用：
+			在于判断释放以读模式打开的读写锁的时候，是否能够完全解锁
+				如果引用计数完全减为0，则以读模式打开的读写锁就解锁了
+				大于0：否则读写锁还是以读模式打开，和想要以写模式打开进行
+				互斥
+
+  4.接口操作
+	
+	定义:pthread_rwlock_t
+	
+	初始化：pthread_rwlock_init(pthread_rwlock_t*,pthread_rwlockattr_t*);
+	
+	加锁：
+		pthread_rwlock_rdlock(pthread_rwlock_t*)--->以读模式打开（加锁）
+		pthread_rwlock_wrlock(pthread_rwlock_t*)--->以写模式打开（加锁）
+	
+	解锁：pthread_rwlock_unlock(pthread_rwlock_t*)
+	      
+    销毁：
+		  pthread_rwlock_destroylock(pthread_rwlock_t*)
+
+例子：
+
+	读写锁变量: pthread_rwlock_t rwlock_;
+	执行流A：读模式打开 pthread_rwlock_rdlock(&rwlock_);//已经打开
+	执行流B：读模式打开 pthread_rwlock_rdlock(&rwlock_);//可以打开
+	执行流C：写模式打开 pthread_wrlock_rdlock(&rwlock_);//并不可以打开，由
+	于已经有执行流以读模式打开了，需要等待以读模式打开的执行流将读写锁进行
+	解锁之后，才可以进行加锁
+
+ **读可以并行，写不可以并行
+
+	
+
