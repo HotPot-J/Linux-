@@ -1,0 +1,20 @@
+1.例子: 
+  echo "123" > test 
+  这样一条命令就可以将123写入文件test中
+
+重定向的本质：
+    #include<unistd.h>
+  int dup2(int oldfd,int newfd);
+   oldf和newfd都是文件描述符。
+
+echo "123" >test 就是:（打比方test文件描述符位3，标准输出为1）
+该语句类比与：dup2(3,1);
+  1.newfd(标准输出)拷贝oldfd(test的文件描述符)
+  2.当拷贝成功则关闭newfd 本标准输出未test的文件描述符，则123被输出早test中。
+   （1） 传参时，如果拷贝的oldfd是一个无效文件描述符，则dup2什么都不做，未关闭newfd
+    （2）传参时，如果newfd和old具有相同的值，dup2也什么都不做,
+    未关闭newfd
+  
+2.
+  >  清空重定向（先将原文件清空，再操作）
+  >> 追加重定向 （直接再原文件的基础上 追加操作）
