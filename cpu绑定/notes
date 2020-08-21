@@ -1,0 +1,55 @@
+   ***知识点补充：
+  （1）查看处理器个数命令：cat /proc/cpuinfo
+  （2）查看进程在那个cpu运行命令：ps -o psr（即cpu） | grep test  （参数o就是需要查看指定列）
+   例子：指定查看（查看test进程的pid，cpu，终端，进程，参数）
+      方法：ps -eo pid，psr，tty，command，args | grep test
+          结果：
+            [jxy@localhost src]$ ps -eo pid,psr,tty,command,args | grep test
+            11078   1 pts/3    ./test                      ./test
+            11079   0 pts/3    ./test                      ./test
+            11161   0 pts/2    grep --color=auto test      grep --color=auto test
+            
+      优化:我们不需要查看grep字段即上边输出结果的最后一行： （grep -v ...）表示过滤掉...字段
+            ps -eo pid,psr,tty,command,args | grep test | grep -v grep
+          结果：         
+            11325   1 pts/3    ./test                      ./test
+            11326   0 pts/3    ./test                      ./test                                                                       
+
+  （3）cpu缓存概念：
+      cpu缓存是位于cpu与内存之间的临时数据交换器，它的容量比内存小的多但是交换速度却比内存快的多。
+                                                                
+  （4）cpu缓存的意义:
+      cpu往往需要重复处理相同数据，重复执行相同指令，如果这部分数据、指令cpu能在cpu缓存中找到，cpu
+      就不需要从内存或硬盘中再读取数据、指令，从而减少了整机的响应时间，所以缓存的意义满足以下两种局部性原理:
+                                                    
+           时间局部性：如果一个信息正在被访问，那么在近期他可能还会被再次访问。
+           空间局部性：如果一个存储器的位置被引用，那么他附近的位置也会被引用
+
+  （5）cpu的三级缓存：
+      随着多核cpu的发展，cpu缓存通常分成了三个级别：L1,L2,L3。级别越小越接近cpu，所以速度更快，同时容量也越小。
+      L1是最接近cpu的，速度最快，容量最小。
+    
+  （6）存取原理：
+      获取数据时，首先会在最快的缓存中找数据，如果缓存没有命中，则往下一级找，直到三级缓存都找不到，就去内存中找。
+              
+
+  （7）***如何完成cpu的亲和呢？（某个进程绑定只在某个cpu上运行）
+  
+       #define _GNU_SOURCE          《--------------------该句在代码首行
+       
+       #include <sched.h>           《--------------------头文件
+
+       int sched_setaffinity(pid_t pid, size_t cpusetsize,cpu_set_t *mask);
+              pid:进程id   （当前进程则写0）
+              cpusetsize:cpu_set_t有多大 sizeof(cpu_set_t)
+              mask：指定处理器   
+              返回值：成功返回0，失败-1
+              
+              ^
+          **  ^操作cpu_set_t类型变量的相关函数:
+            
+            #include <sched.h>
+              void CPU_ZERO(cpu_set_t *set);      <------将cpu_set_t类型变量置空
+              void CPU_SET(int cpu, cpu_set_t *set);<-------添加cpu
+              void CPU_CLR(int cpu, cpu_set_t *set);<---------删除cpu
+              int  CPU_ISSET(int cpu, cpu_set_t *set);<-------判断是否存在
